@@ -1,3 +1,5 @@
+from enum import Enum
+
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -9,6 +11,26 @@ BOOKS = {
 }
 
 
+# enumeration in the path parameter
+class DirectionName(str, Enum):
+    east = "East"
+    west = "west"
+    north = "North"
+    south = "South"
+
+
 @app.get("/")
 async def get_all_books():
     return BOOKS
+
+
+@app.get("/direction/{direction_name}")
+async def get_direction(direction_name: DirectionName):
+    if direction_name == DirectionName.north:
+        return ({"Direction": direction_name, "sub": "Up"},)
+    if direction_name == DirectionName.east:
+        return ({"Direction": direction_name, "sub": "right"},)
+    if direction_name == DirectionName.south:
+        return ({"Direction": direction_name, "sub": "Down"},)
+    if direction_name == DirectionName.west:
+        return ({"Direction": direction_name, "sub": "Left"},)
