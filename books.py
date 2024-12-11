@@ -34,3 +34,11 @@ async def get_direction(direction_name: DirectionName):
         return ({"Direction": direction_name, "sub": "Down"},)
     if direction_name == DirectionName.west:
         return ({"Direction": direction_name, "sub": "Left"},)
+
+
+@app.get("/books/{book_name}")
+async def read_book(book_name: str):
+    book_detail = BOOKS.get(book_name)
+    if book_detail is not None:
+        return book_detail
+    return "No book found"
