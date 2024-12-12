@@ -53,3 +53,28 @@ print(Role.admin.value)    # Output: admin
 ```
 
 - **NOTE:** Role inherit two class str, Enum. str class make sure that member of the class is treated as String
+
+---
+
+# creating a pydantic class object
+
+```python
+
+from uuid import UUID
+
+from pydantic import BaseModel
+
+class Book(BaseModel):
+    id: UUID
+    title: str
+    author: str
+    description: str
+    rating: int
+
+@app.post("/")
+async def create_book(book: Book):
+    BOOKS.append(book)
+
+```
+
+**NOTE:** since the book is type Book which is a inheritence of BaseModel of the pydantic. therefore, the fastapi assume that the book data will in the body
