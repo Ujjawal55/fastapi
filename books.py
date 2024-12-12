@@ -98,3 +98,11 @@ async def update_book(book_name: str, title: str, author: str):
         return BOOKS
 
     return "No books exist"
+
+
+@app.delete("/{book_name}")
+async def delete_book(book_name: str):
+    if book_name in BOOKS:
+        del BOOKS[book_name]
+        return f"{book_name} is deleted"
+    return f"{book_name} does not exist"
