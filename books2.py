@@ -2,10 +2,29 @@ from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
+from starlette.responses import JSONResponse
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+
+
+class NegativeNumberException(Exception):
+    def __init__(self, books_to_return: int):
+        self.books_to_return = books_to_return
+
 
 app = FastAPI()
+
+
+@app.exception_handler(Exception)
+async def negative_number_exception_handler(
+    request: Request, exception: NegativeNumberException
+):
+    return JSONResponse(
+        status_code=418,
+        content={
+            "message": f"hey, why do you need {exception.books_to_return}\nyou should read more books."
+        },
+    )
 
 
 class Book(BaseModel):
@@ -38,11 +57,11 @@ BOOKS = []
 
 @app.get("/")
 async def get_all_books(books_to_return: Optional[int] = None):
+    if books_to_return and books_to_return < 0:
+        raise NegativeNumberException(books_to_return)
     if len(BOOKS) < 1:
         create_book_no_api()
     if books_to_return is not None:
-        if books_to_return < 0:
-            return "books_to_return should be >= 0"
         if books_to_return <= len(BOOKS) > 0:
             return BOOKS[:books_to_return]
     return BOOKS

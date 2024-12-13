@@ -79,6 +79,8 @@ async def create_book(book: Book):
 
 **NOTE:** since the book is type Book which is a inheritence of BaseModel of the pydantic. therefore, the fastapi assume that the book data will in the body
 
+---
+
 # Field class from pydantic
 
 ```python
@@ -99,6 +101,8 @@ class Book(BaseModel):
 
 ```
 
+---
+
 # model_config
 
 ```python
@@ -115,6 +119,8 @@ class Book(BaseModel):
   }
 ```
 
+---
+
 # HTTPException
 
 ```python
@@ -124,4 +130,46 @@ def not_found_404():
   return HTTPException(status_code=404, detail="<detail in here>")
 
 # call this function with the raise keyword.
+
+
 ```
+
+---
+
+# custom exception
+
+```python
+
+class NegativeNumberException(Exception):
+    def __init__(self, books_to_return: int):
+        self.books_to_return = books_to_return
+
+
+app = FastAPI()
+
+
+@app.exception_handler(Exception)
+async def negative_number_exception_handler(
+    request: Request, exception: NegativeNumberException
+):
+  """
+    decorator for the custom exception
+
+    Args:
+      request(Request): contains the information about the HTTP request.
+      exception(NegativeNumberException): instance of the NegativeNumberException class.
+
+    Return:
+      JSONResponse containing the custom message for the exception
+
+  """
+    return JSONResponse(
+        status_code=418,
+        content={
+            "message": f"hey, why do you need {exception.books_to_return}\nyou should read more books."
+        },
+    )
+
+```
+
+## NOTE: use the function with the <u>raise</u> keyword.

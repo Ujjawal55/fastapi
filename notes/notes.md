@@ -41,4 +41,16 @@
 # HTTPException
 
 - declare a function to be used if the task is to repeat
+
   [code](notes.md#L118)
+
+# Custom Exception
+
+### steps
+
+- first step is define a class **_(above the app declaration)_** that inherit the built-in Exception from fastapi
+  - define the attribute in the **\_\_init\_\_** for extra information in the error message.
+- second define a exception decorator just below the **app** definition
+  - use of the definition to tell fastapi what to do when the exception occur.
+
+[code](code.md#L132)
