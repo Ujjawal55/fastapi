@@ -173,3 +173,24 @@ async def negative_number_exception_handler(
 ```
 
 ## NOTE: use the function with the <u>raise</u> keyword.
+
+---
+
+# Response class
+
+```python
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+class Item(BaseModel):
+    name: str
+    price: float
+
+app = FastAPI()
+
+@app.get("/items/", response_model=Item)
+async def read_item():
+    return {"name": "Book", "price": 15.99, "secret_data": "hidden"}
+# here fast api will filter out the {seceret_data}.
+```

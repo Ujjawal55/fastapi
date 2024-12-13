@@ -54,3 +54,11 @@
   - use of the definition to tell fastapi what to do when the exception occur.
 
 [code](code.md#L132)
+
+# Response model class
+
+- **Defination**: A Response Model in FastAPI is a crucial feature that defines and controls the structure of data returned by your API endpoints.
+
+  - if more data present in the return then fastapi will automatically filter out the extra data compare to the **response class attribute**
+
+  [code](code.md#L179)

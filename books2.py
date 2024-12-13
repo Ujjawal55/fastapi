@@ -51,6 +51,18 @@ class Book(BaseModel):
     }
 
 
+class BookNoRating(BaseModel):
+    id: UUID
+    title: str = Field(min_length=1)
+    author: str
+    description: Optional[str] = Field(
+        None,
+        title="Description of the book",
+        min_length=1,
+        max_length=100,
+    )
+
+
 # list of data book: Book(type)
 BOOKS = []
 
@@ -100,28 +112,37 @@ async def read_book(book_id: UUID):
     raise not_found_404()
 
 
+@app.get("/books/rating/{book_id}", response_model=BookNoRating)
+async def read_book_no_rating(book_id: UUID):
+    for book in BOOKS:
+        if book.id == book_id:
+            return book
+
+    raise not_found_404()
+
+
 def create_book_no_api():
     book1 = Book(
         id="6023c928-f9ed-47da-9341-cdb5339c6f9f",  # type: ignore
-        title="title1",
-        author="author1",
-        description="description 1",
+        title="Title 1",
+        author="Author 1",
+        description="Description 1",
         rating=60,
     )
 
     book2 = Book(
         id="7023c928-f9ed-47da-9341-cdb5339c6f9f",  # type: ignore
-        title="title2",
-        author="author2",
-        description="description 2",
+        title="Title 2",
+        author="Author 2",
+        description="Description 2",
         rating=60,
     )
 
     book3 = Book(
         id="8023c928-f9ed-47da-9341-cdb5339c6f9f",  # type: ignore
-        title="title3",
-        author="author3",
-        description="description 3",
+        title="Title 3",
+        author="Author 3",
+        description="Description 3",
         rating=60,
     )
 
