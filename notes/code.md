@@ -114,3 +114,14 @@ class Book(BaseModel):
       }
   }
 ```
+
+# HTTPException
+
+```python
+from fastapi import FastAPI, HTTPException
+
+def not_found_404():
+  return HTTPException(status_code=404, detail="<detail in here>")
+
+# call this function with the raise keyword.
+```

@@ -35,3 +35,10 @@
 - config class should be nested inside the pydantic model
 - **NOTE:** In verson(V2+) the way to define the example configuration for pydantic model has been changed..
   [code](code.md#L101)
+
+# 12 December 2024
+
+# HTTPException
+
+- declare a function to be used if the task is to repeat
+  [code](notes.md#L118)
