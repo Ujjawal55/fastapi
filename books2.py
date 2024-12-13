@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 app = FastAPI()
 
@@ -60,7 +60,7 @@ async def update_books(book_id: UUID, book: Book):
         if BOOKS[i].id == book_id:
             BOOKS[i] = book
             return BOOKS[i]
-    return f"No books exist with id {book_id}"
+    raise not_found_404()
 
 
 @app.delete("/{book_id}")
@@ -69,7 +69,7 @@ async def delete_book(book_id: UUID):
         if BOOKS[i].id == book_id:
             del BOOKS[i]
             return BOOKS
-    return f"No book exist with id {book_id}"
+    raise not_found_404()
 
 
 @app.get("/books/{book_id}")
@@ -78,7 +78,7 @@ async def read_book(book_id: UUID):
         if book.id == book_id:
             return book
 
-    return f"No book exist with id {book_id}"
+    raise not_found_404()
 
 
 def create_book_no_api():
@@ -109,3 +109,7 @@ def create_book_no_api():
     BOOKS.append(book1)
     BOOKS.append(book2)
     BOOKS.append(book3)
+
+
+def not_found_404():
+    return HTTPException(status_code=404, detail="Book not found")
