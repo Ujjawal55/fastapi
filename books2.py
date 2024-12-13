@@ -4,7 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 from starlette.responses import JSONResponse
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, status
 
 
 class NegativeNumberException(Exception):
@@ -67,7 +67,7 @@ class BookNoRating(BaseModel):
 BOOKS = []
 
 
-@app.get("/")
+@app.get("/", status_code=status.HTTP_201_CREATED)
 async def get_all_books(books_to_return: Optional[int] = None):
     if books_to_return and books_to_return < 0:
         raise NegativeNumberException(books_to_return)
