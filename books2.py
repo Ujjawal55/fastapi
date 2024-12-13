@@ -63,6 +63,15 @@ async def update_books(book_id: UUID, book: Book):
     return f"No books exist with id {book_id}"
 
 
+@app.delete("/{book_id}")
+async def delete_book(book_id: UUID):
+    for i in range(len(BOOKS)):
+        if BOOKS[i].id == book_id:
+            del BOOKS[i]
+            return BOOKS
+    return f"No book exist with id {book_id}"
+
+
 @app.get("/books/{book_id}")
 async def read_book(book_id: UUID):
     for book in BOOKS:
@@ -76,7 +85,7 @@ def create_book_no_api():
     book1 = Book(
         id="6023c928-f9ed-47da-9341-cdb5339c6f9f",  # type: ignore
         title="title1",
-        author="author2",
+        author="author1",
         description="description 1",
         rating=60,
     )
