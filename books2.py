@@ -48,6 +48,21 @@ async def get_all_books(books_to_return: Optional[int] = None):
     return BOOKS
 
 
+@app.post("/")
+async def create_book(book: Book):
+    BOOKS.append(book)
+    return BOOKS
+
+
+@app.put("/{book_id}")
+async def update_books(book_id: UUID, book: Book):
+    for i in range(len(BOOKS)):
+        if BOOKS[i].id == book_id:
+            BOOKS[i] = book
+            return BOOKS[i]
+    return f"No books exist with id {book_id}"
+
+
 @app.get("/books/{book_id}")
 async def read_book(book_id: UUID):
     for book in BOOKS:
@@ -55,12 +70,6 @@ async def read_book(book_id: UUID):
             return book
 
     return f"No book exist with id {book_id}"
-
-
-@app.post("/")
-async def create_book(book: Book):
-    BOOKS.append(book)
-    return BOOKS
 
 
 def create_book_no_api():
