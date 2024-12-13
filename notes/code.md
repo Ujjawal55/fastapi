@@ -78,3 +78,39 @@ async def create_book(book: Book):
 ```
 
 **NOTE:** since the book is type Book which is a inheritence of BaseModel of the pydantic. therefore, the fastapi assume that the book data will in the body
+
+# Field class from pydantic
+
+```python
+
+from pydantic import BaseModel, Field
+
+
+class Book(BaseModel):
+    id: UUID
+    title: str = Field(min_length=1)
+    author: str
+    description: Optional[str] = Field(
+        title="Description of the book",
+        min_length=1,
+        max_length=100,
+    )
+    rating: int = Field(ge=1, le=100)
+
+```
+
+# model_config
+
+```python
+  model_config = {
+      "json_schema_extra": {
+          "example": {
+              "id": "60c3c928-f9ed-47da-9341-cdb5339c6f9f",
+              "title": "hello, world",
+              "author": "programming world",
+              "description": "first word for any programmer",
+              "rating": 100,
+          }
+      }
+  }
+```
