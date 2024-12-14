@@ -237,3 +237,18 @@ Base = declarative_base()
 
 # Base will be used to create the database table using the python class..
 ```
+
+# Main.py file
+
+```python
+
+import models
+from database import engine
+
+from fastapi import FastAPI
+
+app = FastAPI()
+
+models.Base.metadata.create_all(bind=engine)
+# use to create the database table from the python classes..
+```
