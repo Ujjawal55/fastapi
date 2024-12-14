@@ -194,3 +194,46 @@ async def read_item():
     return {"name": "Book", "price": 15.99, "secret_data": "hidden"}
 # here fast api will filter out the {seceret_data}.
 ```
+
+---
+
+# Form
+
+```python
+
+@app.post("/book/login")
+async def book_login(username: str = Form(), password: str = Form()):
+    return {
+        "username": username,
+        "password": password,
+    }
+
+```
+
+---
+
+# SqlAlchemy instantiation
+
+```python
+
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+SQL_DATABASE_URL = "sqlite:///./todos.db"
+
+# specify the url of the sqlite database interaction and ./todos.db specify that the todos.db will be creating the current directory..
+
+engine = create_engine(SQL_DATABASE_URL, connect_args={"check same threads": False})
+
+# create a engine for the sqlalchemy which is the starting point of the application and (check same thread = false) specify the multiple thread option
+
+sessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# this is the factory to create database session
+
+
+Base = declarative_base()
+
+# Base will be used to create the database table using the python class..
+```

@@ -62,3 +62,16 @@
   - if more data present in the return then fastapi will automatically filter out the extra data compare to the **response class attribute**
 
   [code](code.md#L179)
+
+# Creating a form
+
+[code](code.md#L200)
+
+# SqlAlchemy
+
+- sqlAlchemy is sql toolkit and ORM for the system that provide powerful interaction with the database.
+
+  - **_Steps:_**
+    - First, you create an engine that connects to your database
+    - Then you create a base class to define your database models
+    - Finally, you use sessionmaker to create sessions for database operations
