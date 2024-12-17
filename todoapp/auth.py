@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import jwt
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -16,6 +16,8 @@ ALGORITHM = "HS256"
 
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl="token")
 
 
 class UserCreate(BaseModel):
@@ -69,6 +71,22 @@ def create_access_token(
     encode.update({"exp": expire})
 
     return jwt.encode(encode, SECERT_KEY, algorithm=ALGORITHM)
+
+
+async def get_current_user(token: str = Depends(oauth2_bearer)):
+    try:
+        payload = jwt.decode(token, SECERT_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub", None)
+        user_id = payload.get("id", None)
+        if username is None or user_id is None:
+            raise HTTPException(status_code=404, detail="User not found")
+        return {
+            "username": username,
+            "user_id": user_id,
+        }
+
+    except JWTError:
+        raise HTTPException(status_code=404, detail="User not found")
 
 
 @app.post("/create/user")
