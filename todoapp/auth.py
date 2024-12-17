@@ -1,14 +1,19 @@
+from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import Depends, FastAPI, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
-from sqlalchemy import FallbackAsyncAdaptedQueuePool
 from sqlalchemy.orm import Session
 
 import models
 from database import SessionLocal, engine
+
+SECERT_KEY = "put_hash_value_in_here"
+ALGORITHM = "HS256"
+
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -51,6 +56,21 @@ def is_user_exist(username: str, password: str, db) -> bool:
     return user
 
 
+def create_access_token(
+    username: str, user_id: int, expire_delta: Optional[timedelta] = None
+):
+    encode = {"sub": username, "id": user_id}
+
+    if expire_delta:
+        expire = datetime.utcnow() + expire_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+
+    encode.update({"exp": expire})
+
+    return jwt.encode(encode, SECERT_KEY, algorithm=ALGORITHM)
+
+
 @app.post("/create/user")
 async def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
     user_model = models.Users(
@@ -77,7 +97,10 @@ async def login_for_access_token(
     if not user:
         raise HTTPException(status_code=404, detail="user not found")
 
-    return "user validated"
+    token_expires = timedelta(minutes=15)
+    token = create_access_token(user.username, user.id, expire_delta=token_expires)
+
+    return {"token": token}
 
 
 def get_hashed_password(password):
