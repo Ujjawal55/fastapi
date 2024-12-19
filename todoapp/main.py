@@ -1,11 +1,12 @@
 from typing import Optional
 
-from fastapi import Depends, FastAPI, HTTPException
+import models
+from auth import get_current_user
+from database import SessionLocal, engine
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-import models
-from database import SessionLocal, engine
+from fastapi import Depends, FastAPI, HTTPException
 
 app = FastAPI()
 
@@ -20,7 +21,7 @@ def get_db():
         db.close()
 
 
-# pydjantic model for the post request::
+# NOTE: pydjantic model for the post request::
 
 
 class TodoCreate(BaseModel):
@@ -37,7 +38,7 @@ async def read_all(db: Session = Depends(get_db)):
     return db.query(models.Todo).all()
 
 
-# post request to create the todo
+# NOTE:  post request to create the todo
 @app.post("/")
 async def create_todo(todo: TodoCreate, db: Session = Depends(get_db)):
     db_todo = models.Todo(
@@ -62,7 +63,7 @@ async def read_todo(todo_id: int, db: Session = Depends(get_db)):
     raise http_exception_404()
 
 
-# put request to the todo
+# NOTE: put request to the todo
 @app.put("/{todo_id}")
 async def update_todo(todo_id: int, todo: TodoCreate, db: Session = Depends(get_db)):
     # get the particular instance of the data
@@ -82,7 +83,9 @@ async def update_todo(todo_id: int, todo: TodoCreate, db: Session = Depends(get_
     return http_status_code_200()
 
 
-# delete request
+# NOTE:  delete request
+
+
 @app.delete("/{todo_id}")
 async def delete_todo(todo_id: int, db: Session = Depends(get_db)):
     todo_model = db.query(models.Todo).filter(models.Todo.id == todo_id).first()
@@ -101,3 +104,19 @@ def http_status_code_200():
 
 def http_exception_404():
     return HTTPException(status_code=404, detail="Todo does not exist.")
+
+
+# NOTE: authentication of user
+
+
+@app.get("/todos/user")
+async def read_all_by_user(
+    user: dict = Depends(get_current_user), db: Session = Depends(get_db)
+):
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="user not found")
+
+    return (
+        db.query(models.Todo).filter(models.Todo.owner_id == user.get("user_id")).all()
+    )
