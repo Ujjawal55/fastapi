@@ -6,7 +6,7 @@ from database import SessionLocal, engine
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, status
 
 app = FastAPI()
 
@@ -84,9 +84,22 @@ async def read_todo(
 
 # NOTE: put request to the todo
 @app.put("/{todo_id}")
-async def update_todo(todo_id: int, todo: TodoCreate, db: Session = Depends(get_db)):
+async def update_todo(
+    todo_id: int,
+    todo: TodoCreate,
+    db: Session = Depends(get_db),
+    user: dict = Depends(get_current_user),
+):
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="user not found")
     # get the particular instance of the data
-    todo_model = db.query(models.Todo).filter(models.Todo.id == todo_id).first()
+    todo_model = (
+        db.query(models.Todo)
+        .filter(models.Todo.id == todo_id)
+        .filter(models.Todo.owner_id == user.get("user_id"))
+        .first()
+    )
 
     if todo_model is None:
         raise http_exception_404()
@@ -95,6 +108,7 @@ async def update_todo(todo_id: int, todo: TodoCreate, db: Session = Depends(get_
     todo_model.description = todo.description  # type: ignore
     todo_model.priority = todo.priority  # type: ignore
     todo_model.complete = todo.complete  # type: ignore
+    todo_model.owner_id = user.get("user_id")  # type: ignore
 
     db.add(todo_model)
     db.commit()
@@ -106,8 +120,18 @@ async def update_todo(todo_id: int, todo: TodoCreate, db: Session = Depends(get_
 
 
 @app.delete("/{todo_id}")
-async def delete_todo(todo_id: int, db: Session = Depends(get_db)):
-    todo_model = db.query(models.Todo).filter(models.Todo.id == todo_id).first()
+async def delete_todo(
+    todo_id: int, db: Session = Depends(get_db), user: dict = Depends(get_current_user)
+):
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="user not found")
+    todo_model = (
+        db.query(models.Todo)
+        .filter(models.Todo.id == todo_id)
+        .filter(models.Todo.owner_id == user.get("user_id"))
+        .first()
+    )
 
     if todo_model is None:
         raise http_exception_404()
