@@ -54,10 +54,20 @@ async def create_todo(todo: TodoCreate, db: Session = Depends(get_db)):
     return {"status_code": 201, "message": "record has been successfully created"}
 
 
+# NOTE: get request to get the todo using todo_id
 @app.get("/todo/{todo_id}")
-async def read_todo(todo_id: int, db: Session = Depends(get_db)):
-    todo = db.query(models.Todo).filter(models.Todo.id == todo_id).first()
+async def read_todo(
+    todo_id: int, db: Session = Depends(get_db), user: dict = Depends(get_current_user)
+):
+    if user is None:
+        raise http_exception_404()
 
+    todo = (
+        db.query(models.Todo)
+        .filter(models.Todo.id == todo_id)
+        .filter(models.Todo.owner_id == user.get("user_id"))
+        .first()
+    )
     if todo is not None:
         return todo
     raise http_exception_404()
