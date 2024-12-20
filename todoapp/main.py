@@ -40,12 +40,21 @@ async def read_all(db: Session = Depends(get_db)):
 
 # NOTE:  post request to create the todo
 @app.post("/")
-async def create_todo(todo: TodoCreate, db: Session = Depends(get_db)):
+async def create_todo(
+    todo: TodoCreate,
+    db: Session = Depends(get_db),
+    user: dict = Depends(get_current_user),
+):
+
+    if user is None:
+        raise http_exception_404()
+
     db_todo = models.Todo(
         title=todo.title,
         description=todo.description,
         priority=todo.priority,
         complete=todo.complete,
+        owner_id=user.get("user_id"),
     )
 
     db.add(db_todo)
