@@ -1,9 +1,9 @@
 from typing import Optional
 
 import models
-from auth import get_current_user
 from database import SessionLocal, engine
 from pydantic import BaseModel, Field
+from routers.auth import get_current_user, router
 from sqlalchemy.orm import Session
 
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -11,6 +11,8 @@ from fastapi import Depends, FastAPI, HTTPException, status
 app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
+
+app.include_router(router)
 
 
 def get_db():
