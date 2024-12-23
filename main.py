@@ -1,3 +1,5 @@
+from starlette.staticfiles import StaticFiles
+
 import models
 from company.companyapis import router as companyapis_router
 from company.dependencies import get_token_header
@@ -10,6 +12,7 @@ from routers.todos import router as todos_router
 app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(auth_router)
 app.include_router(todos_router)
