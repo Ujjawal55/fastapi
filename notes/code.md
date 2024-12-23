@@ -727,3 +727,27 @@ router = APIRouter(
     prefix="/todos", tags=["todos"], responses={404: {"description": "not found"}}
 )
 ```
+
+---
+
+# Dependencies check
+
+```python
+# company/dependecies.py
+
+from fastapi import Header, HTTPException
+
+
+async def get_token_header(internal_token: str = Header(...)):
+    if internal_token != "allowed":
+        raise HTTPException(status_code=400, detail="Internal-header token Invalid")
+
+# main.py
+app.include_router(
+    companyapis_router,
+    prefix="/company",
+    tags=["companyapis"],
+    dependencies=[Depends(get_token_header)],
+    responses={418: {"description": "Internal Use only"}},
+)
+```

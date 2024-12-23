@@ -260,3 +260,17 @@ def user_list():
 def user_detail(user_id: int):
     return {"user": f"user{user_id}"}
 ```
+
+# 23 December 2024
+
+# Router prefix
+
+- router prefix add the common prefix to all the routes in routers
+  [code](code.md#L720)
+
+# Verification before giving response to the company api
+
+- every time someone try to access the company api we ask check for some security measure here we are checking if we have the somekey in the header
+- create the dependecies.py file in the company directories, write the logic and add that method in the router(main.py) as dependencies.
+
+  [code](code.md#L732)

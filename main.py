@@ -1,10 +1,11 @@
 import models
 from company.companyapis import router as companyapis_router
+from company.dependencies import get_token_header
 from database import engine
 from routers.auth import router as auth_router
 from routers.todos import router as todos_router
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 
 app = FastAPI()
 
@@ -16,5 +17,6 @@ app.include_router(
     companyapis_router,
     prefix="/company",
     tags=["companyapis"],
+    dependencies=[Depends(get_token_header)],
     responses={418: {"description": "Internal Use only"}},
 )
