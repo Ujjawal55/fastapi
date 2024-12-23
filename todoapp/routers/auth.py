@@ -29,7 +29,9 @@ class UserCreate(BaseModel):
     hashed_password: str
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/auth", tags=["auth"], responses={401: {"user": "Not authorized"}}
+)
 
 
 def get_db():
@@ -76,14 +78,14 @@ async def get_current_user(token: str = Depends(oauth2_bearer)):
         username = payload.get("sub", None)
         user_id = payload.get("id", None)
         if username is None or user_id is None:
-            raise HTTPException(status_code=404, detail="User not found")
+            raise HTTPException(status_code=401, detail="Unauthorized")
         return {
             "username": username,
             "user_id": user_id,
         }
 
     except JWTError:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=401, detail="User not found")
 
 
 @router.post("/create/user")

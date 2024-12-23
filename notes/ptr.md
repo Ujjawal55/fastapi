@@ -1,5 +1,7 @@
 # Always try to use the absolute path in the import
 
+- absolute import means start from the project root but does not use the root directory name (like from router.auth is absolute path example from database is also)
+
 ```python
 """
 your_project/
@@ -10,6 +12,7 @@ your_project/
 └── routers/
   ├── **init**.py
   └── auth.py
+  └── todos.py
 """
 ```
 
@@ -21,6 +24,10 @@ from routers.auth import router as auth_router
 
 from database import SessionLocal
 from models import Users
+
+# In routers/todos.py
+
+from .auth import something (relative import)
 
 ---
 
