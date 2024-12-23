@@ -274,3 +274,25 @@ def user_detail(user_id: int):
 - create the dependecies.py file in the company directories, write the logic and add that method in the router(main.py) as dependencies.
 
   [code](code.md#L732)
+
+# Installing alembic
+
+- database migration tools specifically designed for the sqlalchemy for the database migration control
+- installation process
+  - pip install alembic
+- Initialization
+  - alembic init {directory_name} (here it is alembic)
+
+# few changes so that the alembic will be connected to the postgresql database
+
+- alembic.ini
+  - sqlalchemy.url = {url value from the database}
+- alembic/env.py
+  - import models
+  - config = context.config (config the defualt)
+  - fileConfig(config.config_file_name) (config the defualt)
+  - target_metadata = models.Base.metadata
+
+# Changing existing user table using alembic
+
+### Adding the phone_number column in the user table
