@@ -296,3 +296,10 @@ def user_detail(user_id: int):
 # Changing existing user table using alembic
 
 ### Adding the phone_number column in the user table
+
+- create a revision file (command: alembic revision -m "create phone number for user col")
+  - create a new file under the alembic/versions/
+- write the code for the upgrade method
+  - for upgrade use the command (alembic upgrade {version_name})
+- write the code for the downgrade method
+  - for downgrade use the command (alembic downgrade -1)
