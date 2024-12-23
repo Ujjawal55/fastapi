@@ -716,3 +716,14 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 ```
+
+---
+
+# Router prefix
+
+```python
+
+router = APIRouter(
+    prefix="/todos", tags=["todos"], responses={404: {"description": "not found"}}
+)
+```
