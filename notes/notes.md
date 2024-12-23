@@ -303,3 +303,12 @@ def user_detail(user_id: int):
   - for upgrade use the command (alembic upgrade {version_name})
 - write the code for the downgrade method
   - for downgrade use the command (alembic downgrade -1)
+
+---
+
+**\*\***\*\***\*\***\*\*\*\***\*\***\*\***\*\***FULLSTACK****\*\*\*\*****\*\*****\*\*\*\*****\*\*\*\*****\*\*\*\*****\*\*****\*\*\*\*****
+
+## some installation
+
+- pip install jinja2(template rendering engine for python)
+- pip install aiofiles(support asyncronous static files support for fastapi)

@@ -1,15 +1,15 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
-from database import SessionLocal
 from jose import JWTError, jwt
-from models import Users
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from database import SessionLocal
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from models import Users
 
 SECERT_KEY = "put_hash_value_in_here"
 ALGORITHM = "HS256"
@@ -27,6 +27,7 @@ class UserCreate(BaseModel):
     first_name: str
     last_name: str
     hashed_password: str
+    phone_number: str
 
 
 router = APIRouter(
@@ -44,6 +45,7 @@ def get_db():
 
 
 def verify_hashed_password(plain_password, hashed_password):
+    print(f"hashed_password: {hashed_password}")
     return bcrypt_context.verify(plain_password, hashed_password)
 
 
@@ -97,6 +99,7 @@ async def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
         last_name=user.last_name,
         hashed_password=get_hashed_password(user.hashed_password),
         is_active=True,
+        phone_number=user.phone_number,
     )
 
     db.add(user_model)
