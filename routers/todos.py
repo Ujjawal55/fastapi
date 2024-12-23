@@ -1,16 +1,20 @@
 from typing import Optional
 
-import models
-from database import SessionLocal
 from pydantic import BaseModel, Field
-from routers.auth import get_current_user
 from sqlalchemy.orm import Session
 
-from fastapi import APIRouter, Depends, HTTPException
+import models
+from database import SessionLocal
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from routers.auth import get_current_user
 
 router = APIRouter(
     prefix="/todos", tags=["todos"], responses={404: {"description": "not found"}}
 )
+
+templates = Jinja2Templates(directory="templates")
 
 
 def get_db():
@@ -61,6 +65,14 @@ async def create_todo(
     db.commit()
 
     return {"status_code": 201, "message": "record has been successfully created"}
+
+
+# NOTE: full stack code
+
+
+@router.get("/test")
+async def test(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
 
 
 # NOTE: get request to get the todo using todo_id
@@ -163,3 +175,6 @@ async def read_all_by_user(
     return (
         db.query(models.Todo).filter(models.Todo.owner_id == user.get("user_id")).all()
     )
+
+
+# ----------------------------------------------------fullstack code---------------------------------------------------------------
