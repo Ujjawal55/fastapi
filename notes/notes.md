@@ -306,9 +306,194 @@ def user_detail(user_id: int):
 
 ---
 
-**\*\***\*\***\*\***\*\*\*\***\*\***\*\***\*\***FULLSTACK****\*\*\*\*****\*\*****\*\*\*\*****\*\*\*\*****\*\*\*\*****\*\*****\*\*\*\*****
+**\*\***\*\***\*\***\*\*\*\***\*\***\*\***\*\***FULLSTACK\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\*\*\***\*\*\*\*\***\*\*\*\*\*\*\***\*\*\***\*\*\*\*\*\*\***
+
+# SOME POINTS TO REMEMBER IN THE FASTAPI
+
+- in the fastapi we define the (different http method seprately for a single route)
+  - depending upon the method different function is get executed.
 
 ## some installation
 
 - pip install jinja2(template rendering engine for python)
 - pip install aiofiles(support asyncronous static files support for fastapi)
+
+# importance of the response_class
+
+- response class is used to control the output of the router
+- by default it try to serialize the return type to json if nothing is mentioned
+- **HTTPResponse** : meaning we are telling that this router will return the raw html file
+
+# Method to use the template
+
+- define the templates directory in the root files.
+- initialize the templates in the file you want to use it
+  - templates = Jinja2Templates(directory="templates")
+- example..
+
+```python
+# make the necessary import
+
+templates = Jinja2Templates(directory="templates")
+@router.get("/", response_class=HTMLResponse)
+async def read_all_by_user(request: Request, db: Session = Depends(get_db)):
+    user = await get_current_user(request)
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND) # redirection
+
+    todos = db.query(models.Todo).filter(models.Todo.owner_id == user.get("id")).all()
+
+    return templates.TemplateResponse( #template response
+        "home.html", {"request": request, "todos": todos, "user": user} # always pass the request in the context dictionary it is mandatory
+    )
+
+```
+
+# To add static file in the fastapi
+
+- add the mount point in the main.py file
+  - app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Different ways to use the form and extract data from it.
+
+---
+
+## 1. Using `Form` Dependency
+
+The `Form` dependency from FastAPI is designed to extract form data from requests with the `application/x-www-form-urlencoded` content type.
+
+### Example:
+
+```python
+from fastapi import FastAPI, Form
+
+app = FastAPI()
+
+@app.post("/submit-form/")
+async def submit_form(name: str = Form(...), email: str = Form(...)):
+    return {"name": name, "email": email}
+```
+
+---
+
+## 2. Using `Pydantic` Models
+
+You can define a Pydantic model to represent the structure of the form fields. This is more readable and reusable for larger forms.
+
+### Example:
+
+```python
+from fastapi import FastAPI, Depends
+from pydantic import BaseModel
+
+class FormData(BaseModel):
+    name: str
+    email: str
+
+app = FastAPI()
+
+@app.post("/submit-form/")
+async def submit_form(data: FormData = Depends()):
+    return data
+```
+
+---
+
+## 3. Using `Request` Object
+
+The `Request` object allows manual handling of form data, providing more flexibility for dynamic or custom scenarios.
+
+### Example:
+
+```python
+from fastapi import FastAPI, Request
+
+app = FastAPI()
+
+@app.post("/submit-form/")
+async def submit_form(request: Request):
+    form_data = await request.form()
+    name = form_data.get("name")
+    email = form_data.get("email")
+    return {"name": name, "email": email}
+```
+
+---
+
+## 4. Combining `Form` with File Uploads
+
+Handle forms that include text fields and file uploads using a combination of `Form` and `File`.
+
+### Example:
+
+```python
+from fastapi import FastAPI, Form, File, UploadFile
+
+app = FastAPI()
+
+@app.post("/upload/")
+async def upload_file(
+    name: str = Form(...),
+    file: UploadFile = File(...)
+):
+    return {"name": name, "filename": file.filename}
+```
+
+---
+
+## 5. Using Query Parameters for Form Data
+
+For simple cases, some form fields can be passed as query parameters.
+
+### Example:
+
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.post("/submit-form/")
+async def submit_form(name: str, email: str):
+    return {"name": name, "email": email}
+```
+
+---
+
+## 6. Using `multipart/form-data`
+
+Handle forms encoded in `multipart/form-data`, especially useful for file uploads and binary data.
+
+### Example:
+
+```python
+from fastapi import FastAPI, Form, File
+
+app = FastAPI()
+
+@app.post("/submit-multipart/")
+async def submit_multipart(
+    name: str = Form(...),
+    file: bytes = File(...)
+):
+    return {"name": name, "file_size": len(file)}
+```
+
+---
+
+## 7. Using Third-Party Libraries
+
+For advanced scenarios, integrate third-party libraries like `FormData` to handle complex or nested forms.
+
+### Example:
+
+```python
+from starlette.datastructures import FormData
+from fastapi import FastAPI, Request
+
+app = FastAPI()
+
+@app.post("/dynamic-form/")
+async def dynamic_form(request: Request):
+    form_data = await request.form()
+    return {key: value for key, value in form_data.items()}
+```
